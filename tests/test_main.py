@@ -50,7 +50,7 @@ def test_home_page(client):
     response = client.get("/")
 
     assert response.status_code == 200
-    assert "Campus Maintenance Tracker" in response.text
+    assert "VJIT CampusCare" in response.text
 
 
 def test_health_check(client):
