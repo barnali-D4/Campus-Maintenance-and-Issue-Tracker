@@ -4,183 +4,611 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Maintenance Tracker</title>
+    <meta name="theme-color" content="#f6f8fc">
+    <meta name="description" content="VJIT CampusCare — a campus maintenance issue reporting and tracking demo.">
+    <title>VJIT CampusCare | Maintenance Dashboard</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <header>
-        <h1>Campus Maintenance Tracker</h1>
-        <p>Report campus problems. Track their resolution.</p>
-    </header>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <a class="brand" href="/" aria-label="VJIT CampusCare home">
+                <img
+                    src="/static/images/VJIT-Logo.jpg"
+                    alt="VJIT logo"
+                    class="brand-logo"
+                >
+                <span class="brand-text">
+                    <strong>VJIT <span class="brand-accent">CampusCare</span></strong>
+                    <small>CAMPUS MAINTENANCE</small>
+                </span>
+            </a>
 
-    <main>
-        <section class="panel">
-            <h2>Report a Maintenance Issue</h2>
-
-            <form id="issue-form">
-                <label for="title">Issue title</label>
-                <input id="title" name="title" required maxlength="150"
-                       placeholder="e.g. Broken classroom fan">
-
-                <label for="category">Category</label>
-                <select id="category" name="category" required>
-                    <option value="">Select category</option>
-                    <option>Electrical</option>
-                    <option>Plumbing</option>
-                    <option>Furniture</option>
-                    <option>Building</option>
-                    <option>IT Equipment</option>
-                    <option>Other</option>
-                </select>
-
-                <label for="description">Description</label>
-                <textarea id="description" name="description"
-                          required placeholder="Describe the problem"></textarea>
-
-                <label for="location">Location</label>
-                <input id="location" name="location" required maxlength="150"
-                       placeholder="e.g. Block A, Room 101">
-
-                <button type="submit">Submit Issue</button>
-                <p id="form-message" role="status"></p>
-            </form>
-        </section>
-
-        <section class="panel">
-            <div class="section-heading">
-                <h2>Reported Issues</h2>
-                <button id="refresh-button" type="button" class="secondary">
-                    Refresh
-                </button>
+            <div class="sidebar-campus-tag">
+                <span class="sidebar-campus-dot"></span>
+                CAMPUS SERVICES DEMO
             </div>
-            <p id="list-message" role="status"></p>
-            <div id="issue-list"></div>
-        </section>
-    </main>
+
+            <p class="nav-label">WORKSPACE</p>
+
+            <a class="nav-link active" href="#dashboard">
+                <span class="nav-icon" aria-hidden="true">▦</span>
+                Overview
+            </a>
+            <a class="nav-link" href="#report-panel">
+                <span class="nav-icon" aria-hidden="true">＋</span>
+                Report an issue
+            </a>
+            <a class="nav-link" href="#issues-panel">
+                <span class="nav-icon" aria-hidden="true">☷</span>
+                Issue management
+            </a>
+
+            <div class="sidebar-note">
+                <span class="online-dot"></span>
+                <div>
+                    <strong>System status</strong>
+                    <p id="connection-status">Checking connection…</p>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <strong>VJIT CAMPUSCARE</strong>
+                <span>Maintenance tracking prototype</span>
+                <span class="sidebar-footer-note">Built as an academic project</span>
+            </div>
+        </aside>
+
+        <main class="main-content" id="dashboard">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">VJIT CAMPUS SERVICES / OVERVIEW</p>
+                    <h1>Maintenance dashboard</h1>
+                    <p class="page-subtitle">
+                        Report problems, monitor priorities, and track resolutions.
+                    </p>
+                </div>
+                <button class="button button-primary" id="new-issue-button" type="button">
+                    <span aria-hidden="true">＋</span> Report an issue
+                </button>
+            </header>
+
+            <section class="campus-banner" aria-label="VJIT campus">
+                <img
+                    src="/static/images/VJIT-Campus-MainBlock.jpg"
+                    alt="Campus building"
+                    class="campus-banner-image"
+                >
+                <div class="campus-banner-overlay">
+                    <span class="campus-banner-label">
+                        <span class="banner-live-dot"></span>
+                        VJIT · CAMPUS SERVICES
+                    </span>
+                    <h2>A better campus starts with us.</h2>
+                    <p>
+                        Report issues, follow their progress, and help keep campus
+                        facilities safe and functional.
+                    </p>
+                    <a href="#report-panel" class="banner-action">
+                        Report a maintenance issue <span aria-hidden="true">→</span>
+                    </a>
+                </div>
+                <div class="campus-banner-caption">CAMPUSCARE · ISSUE TRACKING DEMO</div>
+            </section>
+
+            <section class="stats-grid" aria-label="Issue statistics">
+                <article class="stat-card stat-total">
+                    <div class="stat-top">
+                        <span>Total issues</span>
+                        <span class="stat-icon blue" aria-hidden="true">▤</span>
+                    </div>
+                    <p class="stat-number" id="stat-total">—</p>
+                    <p class="stat-foot">All reported issues</p>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Open</span>
+                        <span class="stat-icon orange" aria-hidden="true">◷</span>
+                    </div>
+                    <p class="stat-number" id="stat-open">—</p>
+                    <p class="stat-foot">Awaiting action</p>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>In progress</span>
+                        <span class="stat-icon purple" aria-hidden="true">↻</span>
+                    </div>
+                    <p class="stat-number" id="stat-progress">—</p>
+                    <p class="stat-foot">Being worked on</p>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-top">
+                        <span>Resolved</span>
+                        <span class="stat-icon green" aria-hidden="true">✓</span>
+                    </div>
+                    <p class="stat-number" id="stat-resolved">—</p>
+                    <p class="stat-foot">Successfully completed</p>
+                </article>
+            </section>
+
+            <section class="panel report-panel" id="report-panel">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">NEW REQUEST</p>
+                        <h2>Report a maintenance issue</h2>
+                        <p class="muted">
+                            Provide the details so the right team can take action.
+                        </p>
+                    </div>
+                    <span class="heading-symbol" aria-hidden="true">＋</span>
+                </div>
+
+                <form id="issue-form">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="title">Issue title <span>*</span></label>
+                            <input
+                                id="title"
+                                name="title"
+                                required
+                                maxlength="150"
+                                placeholder="e.g. Broken classroom fan"
+                            >
+                        </div>
+
+                        <div class="field">
+                            <label for="category">Category <span>*</span></label>
+                            <select id="category" name="category" required>
+                                <option value="">Select a category</option>
+                                <option>Electrical</option>
+                                <option>Plumbing</option>
+                                <option>Furniture</option>
+                                <option>Building</option>
+                                <option>IT Equipment</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+
+                        <div class="field field-full">
+                            <label for="description">Description <span>*</span></label>
+                            <textarea
+                                id="description"
+                                name="description"
+                                required
+                                maxlength="3000"
+                                rows="3"
+                                placeholder="Describe the problem and any relevant details…"
+                            ></textarea>
+                        </div>
+
+                        <div class="field">
+                            <label for="location">Campus location <span>*</span></label>
+                            <input
+                                id="location"
+                                name="location"
+                                required
+                                maxlength="150"
+                                placeholder="e.g. Block A, Room 101"
+                            >
+                        </div>
+
+                        <div class="form-hint">
+                            <span aria-hidden="true">✦</span>
+                            <p>
+                                Priority is assigned automatically using the issue
+                                description and the configured classification rules.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <p id="form-message" class="message" role="status"
+                           aria-live="polite"></p>
+                        <button class="button button-primary" id="submit-button"
+                                type="submit">
+                            Submit issue <span aria-hidden="true">→</span>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="panel issues-panel" id="issues-panel">
+                <div class="panel-heading issues-heading">
+                    <div>
+                        <p class="eyebrow">CAMPUS REQUESTS</p>
+                        <h2>Issue management</h2>
+                        <p class="muted">
+                            Search requests, review priority, and update their status.
+                        </p>
+                    </div>
+                    <button class="button button-outline" id="refresh-button"
+                            type="button">
+                        <span aria-hidden="true">↻</span> Refresh
+                    </button>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="search-box">
+                        <span aria-hidden="true">⌕</span>
+                        <input
+                            id="search-input"
+                            type="search"
+                            placeholder="Search title, location, description…"
+                            aria-label="Search issues"
+                        >
+                    </div>
+
+                    <select id="status-filter" aria-label="Filter by status">
+                        <option value="">All statuses</option>
+                        <option>Open</option>
+                        <option>In Progress</option>
+                        <option>Resolved</option>
+                    </select>
+
+                    <select id="priority-filter" aria-label="Filter by priority">
+                        <option value="">All priorities</option>
+                        <option>Critical</option>
+                        <option>High</option>
+                        <option>Medium</option>
+                        <option>Low</option>
+                    </select>
+
+                    <select id="category-filter" aria-label="Filter by category">
+                        <option value="">All categories</option>
+                        <option>Electrical</option>
+                        <option>Plumbing</option>
+                        <option>Furniture</option>
+                        <option>Building</option>
+                        <option>IT Equipment</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+                <div class="list-toolbar">
+                    <p id="list-message" role="status" aria-live="polite">
+                        Loading issues…
+                    </p>
+                    <button class="text-button" id="clear-filters" type="button">
+                        Clear filters
+                    </button>
+                </div>
+
+                <div id="issue-list" class="issue-list"></div>
+            </section>
+
+            <footer class="page-footer">
+                <span>
+                    <span class="footer-dot"></span>
+                    VJIT CampusCare
+                </span>
+                <span>Academic prototype · Campus maintenance issue tracking</span>
+            </footer>
+        </main>
+    </div>
 
     <script>
         const form = document.getElementById("issue-form");
         const formMessage = document.getElementById("form-message");
         const listMessage = document.getElementById("list-message");
         const issueList = document.getElementById("issue-list");
+        const connectionStatus = document.getElementById("connection-status");
+        const submitButton = document.getElementById("submit-button");
+        const refreshButton = document.getElementById("refresh-button");
 
-        async function loadIssues() {
-            listMessage.textContent = "Loading issues...";
-            issueList.replaceChildren();
+        const searchInput = document.getElementById("search-input");
+        const statusFilter = document.getElementById("status-filter");
+        const priorityFilter = document.getElementById("priority-filter");
+        const categoryFilter = document.getElementById("category-filter");
 
-            try {
-                const response = await fetch("/api/issues");
-                if (!response.ok) throw new Error("Could not load issues.");
+        let allIssues = [];
+        let loading = false;
 
-                const issues = await response.json();
-                listMessage.textContent = issues.length
-                    ? `${issues.length} issue(s) reported`
-                    : "No issues have been reported yet.";
-
-                for (const issue of issues) {
-                    const card = document.createElement("article");
-                    card.className = "issue-card";
-
-                    const title = document.createElement("h3");
-                    title.textContent = `#${issue.id} — ${issue.title}`;
-
-                    const details = document.createElement("p");
-                    details.textContent =
-                        `${issue.category} | ${issue.location}`;
-
-                    const description = document.createElement("p");
-                    description.textContent = issue.description;
-
-                    const metadata = document.createElement("p");
-                    metadata.className = "metadata";
-                    metadata.textContent =
-                        `Priority: ${issue.priority} | Status: ${issue.status}`;
-
-                    
-const statusLabel = document.createElement("label");
-statusLabel.textContent = "Update status: ";
-
-const statusSelect = document.createElement("select");
-
-for (const status of ["Open", "In Progress", "Resolved"]) {
-    const option = document.createElement("option");
-    option.value = status;
-    option.textContent = status;
-    statusSelect.appendChild(option);
-}
-
-statusSelect.value = issue.status;
-
-const saveButton = document.createElement("button");
-saveButton.type = "button";
-saveButton.textContent = "Save status";
-
-saveButton.addEventListener("click", async () => {
-    saveButton.disabled = true;
-
-    try {
-        const response = await fetch(
-            `/api/issues/${issue.id}/status?status=${encodeURIComponent(statusSelect.value)}`,
-            { method: "PATCH" }
-        );
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.detail || "Could not update status.");
+        function setMessage(element, message, type = "") {
+            element.textContent = message;
+            element.className = type ? `message ${type}` : "message";
         }
 
-        listMessage.textContent =
-            `Issue #${result.id} updated to ${result.status}.`;
+        function makeElement(tag, className, text) {
+            const element = document.createElement(tag);
+            if (className) element.className = className;
+            if (text !== undefined) element.textContent = text;
+            return element;
+        }
 
-        await loadIssues();
-    } catch (error) {
-        listMessage.textContent = error.message;
-    } finally {
-        saveButton.disabled = false;
-    }
-});
+        function updateStats(issues) {
+            document.getElementById("stat-total").textContent = issues.length;
+            document.getElementById("stat-open").textContent =
+                issues.filter(issue => issue.status === "Open").length;
+            document.getElementById("stat-progress").textContent =
+                issues.filter(issue => issue.status === "In Progress").length;
+            document.getElementById("stat-resolved").textContent =
+                issues.filter(issue => issue.status === "Resolved").length;
+        }
 
-statusLabel.appendChild(statusSelect);
-card.append(title, details, description, metadata, statusLabel, saveButton);
+        function badgeClass(value) {
+            const safeValue = String(value || "")
+                .toLowerCase()
+                .replace(/\s+/g, "-");
+            return `badge badge-${safeValue}`;
+        }
 
-                    issueList.appendChild(card);
+        function renderIssues() {
+            const query = searchInput.value.trim().toLowerCase();
+            const status = statusFilter.value;
+            const priority = priorityFilter.value;
+            const category = categoryFilter.value;
+
+            const filtered = allIssues.filter(issue => {
+                const searchable = [
+                    issue.title,
+                    issue.category,
+                    issue.description,
+                    issue.location,
+                    issue.status,
+                    issue.priority
+                ].join(" ").toLowerCase();
+
+                return searchable.includes(query)
+                    && (!status || issue.status === status)
+                    && (!priority || issue.priority === priority)
+                    && (!category || issue.category === category);
+            });
+
+            issueList.replaceChildren();
+            listMessage.textContent =
+                `Showing ${filtered.length} of ${allIssues.length} issue(s)`;
+
+            if (!filtered.length) {
+                const empty = makeElement("div", "empty-state");
+                empty.append(
+                    makeElement("span", "empty-icon",
+                        allIssues.length ? "⌕" : "✓"),
+                    makeElement("h3", "",
+                        allIssues.length
+                            ? "No matching issues"
+                            : "No issues reported yet"),
+                    makeElement("p", "",
+                        allIssues.length
+                            ? "Try changing your search or filters."
+                            : "Use the report form above to submit the first request.")
+                );
+                issueList.appendChild(empty);
+                return;
+            }
+
+            for (const issue of filtered) {
+                const card = makeElement("article", "issue-card");
+                const main = makeElement("div", "issue-main");
+                const top = makeElement("div", "issue-card-top");
+
+                const heading = makeElement(
+                    "h3",
+                    "issue-title",
+                    `#${issue.id} · ${issue.title}`
+                );
+                const priorityBadge = makeElement(
+                    "span",
+                    badgeClass(issue.priority),
+                    issue.priority || "Unclassified"
+                );
+
+                top.append(heading, priorityBadge);
+
+                const description = makeElement(
+                    "p",
+                    "issue-description",
+                    issue.description || "No description provided."
+                );
+
+                const details = makeElement("div", "issue-details");
+                details.append(
+                    makeElement("span", "detail-chip",
+                        `▦ ${issue.category || "Uncategorized"}`),
+                    makeElement("span", "detail-chip",
+                        `⌖ ${issue.location || "Location not specified"}`)
+                );
+
+                const statusRow = makeElement("div", "issue-status-row");
+                const statusBadge = makeElement(
+                    "span",
+                    badgeClass(issue.status),
+                    issue.status || "Open"
+                );
+
+                const statusControls = makeElement("div", "status-controls");
+                const statusSelect = makeElement("select", "status-select");
+                statusSelect.setAttribute(
+                    "aria-label",
+                    `Status for issue ${issue.id}`
+                );
+                statusSelect.id = `status-${issue.id}`;
+
+                for (const value of ["Open", "In Progress", "Resolved"]) {
+                    const option = makeElement("option", "", value);
+                    option.value = value;
+                    statusSelect.appendChild(option);
                 }
-            } catch (error) {
-                listMessage.textContent = error.message;
+                statusSelect.value = issue.status || "Open";
+
+                const saveButton = makeElement(
+                    "button",
+                    "button button-small",
+                    "Save status"
+                );
+                saveButton.type = "button";
+
+                saveButton.addEventListener("click", async () => {
+                    if (statusSelect.value === issue.status) {
+                        listMessage.textContent =
+                            `Issue #${issue.id} has no status change.`;
+                        return;
+                    }
+
+                    saveButton.disabled = true;
+                    saveButton.textContent = "Saving…";
+
+                    try {
+                        const response = await fetch(
+                            `/api/issues/${issue.id}/status?status=${
+                                encodeURIComponent(statusSelect.value)
+                            }`,
+                            { method: "PATCH" }
+                        );
+
+                        const result = await response.json();
+
+                        if (!response.ok) {
+                            throw new Error(
+                                result.detail || "Could not update status."
+                            );
+                        }
+
+                        listMessage.textContent =
+                            `Issue #${result.id} updated to ${result.status}.`;
+                        await loadIssues();
+                    } catch (error) {
+                        listMessage.textContent = error.message;
+                    } finally {
+                        saveButton.disabled = false;
+                        saveButton.textContent = "Save status";
+                    }
+                });
+
+                statusControls.append(statusSelect, saveButton);
+                statusRow.append(statusBadge, statusControls);
+                main.append(top, description, details, statusRow);
+                card.appendChild(main);
+                issueList.appendChild(card);
             }
         }
 
-        form.addEventListener("submit", async (event) => {
+        async function loadIssues() {
+            if (loading) return;
+
+            loading = true;
+            refreshButton.disabled = true;
+            refreshButton.textContent = "↻ Loading…";
+            connectionStatus.textContent = "Connecting to API…";
+
+            try {
+                const response = await fetch("/api/issues", {
+                    headers: { "Accept": "application/json" }
+                });
+
+                if (!response.ok) {
+                    throw new Error("Unable to load issues from the server.");
+                }
+
+                const data = await response.json();
+
+                if (!Array.isArray(data)) {
+                    throw new Error("Unexpected response from the issues API.");
+                }
+
+                allIssues = data;
+                updateStats(allIssues);
+                renderIssues();
+
+                connectionStatus.textContent = "API connected";
+                connectionStatus.classList.add("connected");
+            } catch (error) {
+                connectionStatus.textContent = "API unavailable";
+                connectionStatus.classList.remove("connected");
+                listMessage.textContent = error.message;
+                issueList.replaceChildren();
+
+                const empty = makeElement("div", "empty-state");
+                empty.append(
+                    makeElement("span", "empty-icon", "!"),
+                    makeElement("h3", "", "Couldn't load issues"),
+                    makeElement("p", "",
+                        "Check the server connection and try refreshing.")
+                );
+                issueList.appendChild(empty);
+            } finally {
+                loading = false;
+                refreshButton.disabled = false;
+                refreshButton.textContent = "↻ Refresh";
+            }
+        }
+
+        form.addEventListener("submit", async event => {
             event.preventDefault();
-            formMessage.textContent = "Submitting...";
+
+            submitButton.disabled = true;
+            submitButton.textContent = "Submitting…";
+            setMessage(formMessage, "Sending your report…");
 
             const data = Object.fromEntries(new FormData(form).entries());
 
             try {
                 const response = await fetch("/api/issues", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
                     body: JSON.stringify(data)
                 });
 
                 const result = await response.json();
 
                 if (!response.ok) {
-                    throw new Error(result.detail || "Submission failed.");
+                    throw new Error(
+                        typeof result.detail === "string"
+                            ? result.detail
+                            : "Please check your input and try again."
+                    );
                 }
 
-                formMessage.textContent =
-                    `Issue #${result.id} submitted. Priority: ${result.priority}.`;
+                setMessage(
+                    formMessage,
+                    `Issue #${result.id} submitted successfully. Assigned priority: ${result.priority}.`,
+                    "success-message"
+                );
+
                 form.reset();
                 await loadIssues();
+
+                document.getElementById("issues-panel").scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
             } catch (error) {
-                formMessage.textContent = error.message;
+                setMessage(formMessage, error.message, "error-message");
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML =
+                    'Submit issue <span aria-hidden="true">→</span>';
             }
         });
 
-        document.getElementById("refresh-button")
-            .addEventListener("click", loadIssues);
+        [searchInput, statusFilter, priorityFilter, categoryFilter]
+            .forEach(control => {
+                control.addEventListener("input", renderIssues);
+                control.addEventListener("change", renderIssues);
+            });
+
+        document.getElementById("clear-filters").addEventListener("click", () => {
+            searchInput.value = "";
+            statusFilter.value = "";
+            priorityFilter.value = "";
+            categoryFilter.value = "";
+            renderIssues();
+        });
+
+        refreshButton.addEventListener("click", loadIssues);
+
+        document.getElementById("new-issue-button").addEventListener("click", () => {
+            document.getElementById("report-panel").scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+            document.getElementById("title").focus({ preventScroll: true });
+        });
 
         loadIssues();
     </script>
