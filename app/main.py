@@ -21,7 +21,8 @@ from app.priority import classify_priority
 # Database initialization
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    Base.metadata.create_all(bind=engine)
+    if engine is not None:
+        Base.metadata.create_all(bind=engine)
     yield
 
 
