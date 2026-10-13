@@ -5,7 +5,7 @@ A web-based system for reporting, prioritizing, and tracking campus maintenance 
 
 ## Preview
 
-<!-- Add application screenshot here -->
+<img width="1917" height="928" alt="Campus-Tracker-preview" src="https://github.com/user-attachments/assets/820a2025-420d-4554-a5cd-cf3851f21117" />
 
 ## Key Features
 
@@ -27,9 +27,10 @@ A web-based system for reporting, prioritizing, and tracking campus maintenance 
 
 **Live Demo:** Coming soon
 
-## Repository
+## Contributors:
 
-[View on GitHub](https://github.com/barnali-D4/Campus-Maintenance-and-Issue-Tracker)
+1. Barnali Bhowmik (23911A66D4)
+2. Vanatadapala manaswini (23911A66J8)
 
 ---
 
