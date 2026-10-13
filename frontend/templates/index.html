@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Maintenance Tracker</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>Campus Maintenance Tracker</h1>
+        <p>Report campus problems. Track their resolution.</p>
+    </header>
+
+    <main>
+        <section class="panel">
+            <h2>Report a Maintenance Issue</h2>
+
+            <form id="issue-form">
+                <label for="title">Issue title</label>
+                <input id="title" name="title" required maxlength="150"
+                       placeholder="e.g. Broken classroom fan">
+
+                <label for="category">Category</label>
+                <select id="category" name="category" required>
+                    <option value="">Select category</option>
+                    <option>Electrical</option>
+                    <option>Plumbing</option>
+                    <option>Furniture</option>
+                    <option>Building</option>
+                    <option>IT Equipment</option>
+                    <option>Other</option>
+                </select>
+
+                <label for="description">Description</label>
+                <textarea id="description" name="description"
+                          required placeholder="Describe the problem"></textarea>
+
+                <label for="location">Location</label>
+                <input id="location" name="location" required maxlength="150"
+                       placeholder="e.g. Block A, Room 101">
+
+                <button type="submit">Submit Issue</button>
+                <p id="form-message" role="status"></p>
+            </form>
+        </section>
+
+        <section class="panel">
+            <div class="section-heading">
+                <h2>Reported Issues</h2>
+                <button id="refresh-button" type="button" class="secondary">
+                    Refresh
+                </button>
+            </div>
+            <p id="list-message" role="status"></p>
+            <div id="issue-list"></div>
+        </section>
+    </main>
+
+    <script>
+        const form = document.getElementById("issue-form");
+        const formMessage = document.getElementById("form-message");
+        const listMessage = document.getElementById("list-message");
+        const issueList = document.getElementById("issue-list");
+
+        async function loadIssues() {
+            listMessage.textContent = "Loading issues...";
+            issueList.replaceChildren();
+
+            try {
+                const response = await fetch("/api/issues");
+                if (!response.ok) throw new Error("Could not load issues.");
+
+                const issues = await response.json();
+                listMessage.textContent = issues.length
+                    ? `${issues.length} issue(s) reported`
+                    : "No issues have been reported yet.";
+
+                for (const issue of issues) {
+                    const card = document.createElement("article");
+                    card.className = "issue-card";
+
+                    const title = document.createElement("h3");
+                    title.textContent = `#${issue.id} — ${issue.title}`;
+
+                    const details = document.createElement("p");
+                    details.textContent =
+                        `${issue.category} | ${issue.location}`;
+
+                    const description = document.createElement("p");
+                    description.textContent = issue.description;
+
+                    const metadata = document.createElement("p");
+                    metadata.className = "metadata";
+                    metadata.textContent =
+                        `Priority: ${issue.priority} | Status: ${issue.status}`;
+
+                    
+const statusLabel = document.createElement("label");
+statusLabel.textContent = "Update status: ";
+
+const statusSelect = document.createElement("select");
+
+for (const status of ["Open", "In Progress", "Resolved"]) {
+    const option = document.createElement("option");
+    option.value = status;
+    option.textContent = status;
+    statusSelect.appendChild(option);
+}
+
+statusSelect.value = issue.status;
+
+const saveButton = document.createElement("button");
+saveButton.type = "button";
+saveButton.textContent = "Save status";
+
+saveButton.addEventListener("click", async () => {
+    saveButton.disabled = true;
+
+    try {
+        const response = await fetch(
+            `/api/issues/${issue.id}/status?status=${encodeURIComponent(statusSelect.value)}`,
+            { method: "PATCH" }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.detail || "Could not update status.");
+        }
+
+        listMessage.textContent =
+            `Issue #${result.id} updated to ${result.status}.`;
+
+        await loadIssues();
+    } catch (error) {
+        listMessage.textContent = error.message;
+    } finally {
+        saveButton.disabled = false;
+    }
+});
+
+statusLabel.appendChild(statusSelect);
+card.append(title, details, description, metadata, statusLabel, saveButton);
+
+                    issueList.appendChild(card);
+                }
+            } catch (error) {
+                listMessage.textContent = error.message;
+            }
+        }
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            formMessage.textContent = "Submitting...";
+
+            const data = Object.fromEntries(new FormData(form).entries());
+
+            try {
+                const response = await fetch("/api/issues", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.detail || "Submission failed.");
+                }
+
+                formMessage.textContent =
+                    `Issue #${result.id} submitted. Priority: ${result.priority}.`;
+                form.reset();
+                await loadIssues();
+            } catch (error) {
+                formMessage.textContent = error.message;
+            }
+        });
+
+        document.getElementById("refresh-button")
+            .addEventListener("click", loadIssues);
+
+        loadIssues();
+    </script>
+</body>
+</html>
